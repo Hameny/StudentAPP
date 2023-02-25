@@ -16,15 +16,15 @@ import java.util.UUID;
 
 @Component
 public class StudentRepositoryIMPL implements StudentRepository {
-    List<Student> studentList = new ArrayList<>();
 
     @Override
     public List<Student> getAllStudents() {
+        List<Student> studentList = new ArrayList<>();
         try {
             Statement statement = ConnectionManager.open().createStatement();
             String q = "SELECT * FROM students";
             ResultSet resultSet = statement.executeQuery(q);
-            resultSet(resultSet);
+            studentList = resultSet(resultSet);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -33,6 +33,7 @@ public class StudentRepositoryIMPL implements StudentRepository {
 
     @Override
     public List<Student> getStudentById(UUID idStudent) {
+        List<Student> studentList = new ArrayList<>();
         String searchStudentById = "SELECT * FROM students WHERE id = ?";
         try {
             PreparedStatement preparedStatement = ConnectionManager.open().prepareStatement(searchStudentById);
@@ -47,6 +48,7 @@ public class StudentRepositoryIMPL implements StudentRepository {
 
     @Override
     public List<Student> getStudentBySecondName(String secondName) {
+        List<Student> studentList = new ArrayList<>();
         String searchStudentBySecondName = "SELECT * FROM students WHERE second_name = ?";
         try {
             PreparedStatement preparedStatement = ConnectionManager.open().prepareStatement(searchStudentBySecondName);
@@ -59,7 +61,8 @@ public class StudentRepositoryIMPL implements StudentRepository {
         return studentList;
     }
 
-    private void resultSet(ResultSet resultSet) throws SQLException {
+    private List<Student> resultSet(ResultSet resultSet) throws SQLException {
+        List<Student> studentList = new ArrayList<>();
         while (resultSet.next()) {
             UUID id = UUID.fromString(resultSet.getString("id"));
             String firstName = resultSet.getString("first_name");
@@ -69,6 +72,8 @@ public class StudentRepositoryIMPL implements StudentRepository {
             UUID groupId = UUID.fromString(resultSet.getString("group_id"));
             Student student = new Student(id, firstName, secondName, dateOfBirthday, isDelete, groupId);
             studentList.add(student);
+
         }
+        return studentList;
     }
 }
